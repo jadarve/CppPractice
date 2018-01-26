@@ -1,0 +1,37 @@
+{
+    "name" : "ComputeGraph",
+    "version" : "1.2.3",
+
+    "memories": [
+        {
+            "name"      : "memory_0",
+            "flags"     : ["HOST_VISIBLE", "HOST_COHERENT"],
+            "page_size" : 4096
+        },
+        {
+            "name"      : "memory_1",
+            "flags"     : ["DEVICE_LOCAL"],
+            "page_size" : 4096
+        }
+    ],
+    "buffers": [
+        {
+            "name"   : "buffer_0",
+            "memory" : "memory_0",
+            "usage"  : ["STORAGE", "TRANSFER_SRC", "TRANSFER_DST"],
+            "size"   : 1024
+        },
+        {
+            "name"   : "buffer_1",
+            "memory" : "memory_1",
+            "usage"  : ["TRANSFER_SRC"],
+            "size"   : 4096
+        },
+        {
+            "name"   : "buffer_2",
+            "memory" : "memory_1",
+            "usage"  : ["TRANSFER_DST"],
+            "size"   : 2048
+        }
+    ]
+}
