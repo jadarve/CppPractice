@@ -1,6 +1,8 @@
 #ifndef COMPUTE_GRAPH_H_
 #define COMPUTE_GRAPH_H_
 
+#include "Visitor.h"
+
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -8,24 +10,18 @@
 #include <vector>
 
 
-// forward declarations
-class Visitor;
-
-
 class Memory {
 
 public:
-    void accept(Visitor* visitor) {
-        // nothing to do, no more objects in the hierarchy
-    }
+    void accept(Visitor* visitor);
 
     // Getters and Setters
 
-    void setPageSize(const uint32_t size) noexcept            { pageSize = size;}
-    uint32_t getPageSize() const noexcept                     { return pageSize;}
+    void setPageSize(const uint32_t size) noexcept;
+    uint32_t getPageSize() const noexcept;
 
-    const std::vector<std::string>& getFlags() const noexcept { return flags;}
-    void pushFlag(const std::string& flag)                    { flags.push_back(flag);}
+    const std::vector<std::string>& getFlags() const noexcept;
+    void pushFlag(const std::string& flag);
 
 private:
     uint32_t pageSize;
@@ -33,25 +29,18 @@ private:
 
     // Vulkan stuff
 
-}; // class Memory
+};
 
 
 class Buffer {
 
 public:
-    Buffer(const size& size, std::shared_ptr<Memory> memory) :
-        size {size},
-        memory {memory} {
+    Buffer(const uint32_t size, std::shared_ptr<Memory> memory);
 
-    }
+    void accept(Visitor* visitor);
 
-
-    void accept(Visitor* visitor) {
-        // nothing to do, no more objects in the hierarchy
-    }
-
-    uint32_t getSize() const noexcept                  { return size;}
-    std::shared_ptr<Memory> getMemory() const noexcept { return memory;}
+    uint32_t getSize() const noexcept;
+    std::shared_ptr<Memory> getMemory() const noexcept;
 
 private:
     uint32_t size;
@@ -59,47 +48,26 @@ private:
 
     // Vulkan stuff
 
-}; // class Buffer
+};
 
 
 class ComputeGraph {
 
 public:
 
-    void accept(Visitor* visitor) {
-
-        visitor->visitComputeGraph(this);
-
-        // visit memories
-        for (const auto& v : memories) {
-            visitor->visitMemory(v.first, v.second);
-        }
-
-        // visit buffers
-        for (const auto& v : buffers) {
-            visitor->visitBuffer(v.first, v.second);
-        }
-    }
+    void accept(Visitor* visitor);
 
 
-    void addMemory(const std::string& name, std::shared_ptr<Memory> memory)                      { memories[name] = memory;}
-    // const std::unordered_map<std::string, std::shared_ptr<Memory>>& getMemories() const noexcept { return memories;}
-    std::string getMemoryName(std::shared_ptr<Memory> memory) {
+    void addMemory(const std::string& name, std::shared_ptr<Memory> memory);
+    std::string getMemoryName(std::shared_ptr<Memory> memory);
 
-        for (const auto& v : memories) {
-            if (v.second == memory) { return v.first; }
-        }
-        return std::string {}; // should throw exception
-    }
+    void addBuffer(const std::string& name, std::shared_ptr<Buffer> buffer);
 
-    void addBuffer(const std::string& name, std::shared_ptr<Buffer> buffer)                      { buffers[name] = buffer;}
-    // const std::unordered_map<std::string, std::shared_ptr<Buffer>>& getBuffers() const noexcept  { return buffers;}
+    void setName(const std::string& name);
+    const std::string& getName() const noexcept;
 
-    void setName(const std::string& name)          { this->name = name;}
-    const std::string& getName() const noexcept    { return name;}
-
-    void setVersion(const std::string& version)    { this->version = version;}
-    const std::string& getVersion() const noexcept { return version;}
+    void setVersion(const std::string& version);
+    const std::string& getVersion() const noexcept;
 
 private:
     std::string name;
